@@ -1,3 +1,5 @@
+####testing
+
 import pytest
 from datetime import datetime
 from etl import extract_data, transform_data, load_data
@@ -31,14 +33,13 @@ def setup_database(mocker):
     cursor.close()
     conn.close()
 
-def test_etl_process(setup_database, mocker):
-    # Test extract_data function
+def test_extract_data(setup_database):
     extracted_data = list(extract_data())
-    assert len(extracted_data) == 2  # Check if the number of records is as expected
-    
-    # Test transform_data function
+    assert len(extracted_data) == 2
+
+def test_transform_data(setup_database):
+    extracted_data = list(extract_data())
     transformed_data = transform_data(extracted_data)
-    assert len(transformed_data) == 2  # Check if the number of records is as expected
     assert transformed_data[0] == {
         "id": 1,
         "sensor_id": 1,
@@ -46,18 +47,25 @@ def test_etl_process(setup_database, mocker):
         "humidity_percentage": 60.1,
         "recorded_at": "2024-09-17 17:17:43"
     }
+
+def test_load_data(setup_database, mocker):
+    # Extract the data first using the mock database
+    extracted_data = list(extract_data())
     
-    # Verify MinIO interaction
+    # Transform the extracted data
+    transformed_data = transform_data(extracted_data)
+
+    # Mock the MinIO client
     minio_client = mocker.MagicMock()
     mocker.patch('etl.Minio', return_value=minio_client)
     
-    # Test load_data function
+    # Call load_data with the transformed data
     filename = load_data(transformed_data)
-    assert filename.endswith(".csv")  # Check if the filename has the correct extension
 
-    # Check if file was uploaded to MinIO
+    # Assertions
+    assert filename.endswith(".csv")  # Check if the filename has the correct extension
     minio_client.fput_object.assert_called_once_with(
-        "data-lake-test",
+        "data-lake-test",  # Replace with your bucket name
         filename,
         filename
     )
