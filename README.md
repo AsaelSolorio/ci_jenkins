@@ -1,2 +1,2 @@
 # ci_jenkins
-jenkins
+jenkins_pipeline
