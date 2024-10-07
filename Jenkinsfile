@@ -20,25 +20,17 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                // Install dependencies inside the Python Docker container
-                echo 'Installing dependencies...'
-                script {
-                    docker.image('python:3.10.12').inside {
-                        sh 'pip install -r scripts/requirements.txt'
-                    }
-                }
-            }
-        }
-
         stage('Run Tests') {
             steps {
                 // Run tests inside the Python Docker container
                 echo 'Running tests...'
                 script {
                     docker.image('python:3.10.12').inside {
-                        sh 'pytest scripts/test_etl.py'
+                        // Install dependencies and run tests in the same container
+                        sh '''
+                            pip install --no-cache-dir -r scripts/requirements.txt
+                            pytest scripts/test_etl.py
+                        '''
                     }
                 }
             }
