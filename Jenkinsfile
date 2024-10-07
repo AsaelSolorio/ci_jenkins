@@ -43,18 +43,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Run ETL') {
-            steps {
-                // Run ETL process
-                echo 'Running ETL...'
-                script {
-                    docker.image('python:3.10.12').inside {
-                        sh 'pytest scripts/etl.py'
-                    }
-                }
-            }
-        }
     }
 
     post {
