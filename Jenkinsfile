@@ -10,6 +10,16 @@ pipeline {
             }
         }
 
+        stage('Test Docker Access') {
+            steps {
+                script {
+                    // Check if Docker is accessible
+                    echo 'Testing Docker access...'
+                    sh 'docker --version'
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 // Install dependencies inside the Python Docker container
